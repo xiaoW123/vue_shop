@@ -15,7 +15,44 @@ const router = new VueRouter({
     },
     {
       path: '/home',
-      component: () => import ('@/components/Home.vue')
+      redirect: '/welcome',
+      component: () => import ('@/components/Home.vue'),
+      children: [
+        {
+          path: '/welcome',
+          component: () => import('@/components/Welcome.vue')
+        },
+        {
+          path: '/users',
+          component: () => import('@/components/user/User.vue')
+        },
+        // {
+        //   path: '/roles',
+        //   component: () => import('@/components/user/User.vue')
+        // },
+        // {
+        //   path: '/rights',
+        //   component: () => import('@/components/user/User.vue')
+        // },
+        // {
+        //   path: '/goods',
+        //   component: () => import('@/components/user/User.vue')
+        // },
+        // {
+        //   path: '/params',
+        //   component: () => import('@/components/user/User.vue')
+        // },
+        // {
+        //   path: '/categories',
+        //   component: () => import('@/components/user/User.vue')
+        // },{
+        //   path: '/orders',
+        //   component: () => import('@/components/user/User.vue')
+        // },{
+        //   path: '/reports',
+        //   component: () => import('@/components/user/User.vue')
+        // }
+      ]
     }
   ],
   mode: 'history' 
