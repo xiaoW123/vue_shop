@@ -23,7 +23,7 @@
             :unique-opened="true"
             :collapse= "isCollapse"
             :collapse-transition = "false"
-            router
+            :router = "true"
             :default-active="isPath">
 
             <!-- default-active="/users"> -->
@@ -94,10 +94,10 @@ export default {
         method: 'get',
         url: 'menus'
       }).then(result => {
-        if(result.data.meta.status !== 200) return this.$message.error('数据请求失败！');
         const {data: res} = result
         this.menulist = res.data
-        console.log(this.menulist)
+      }).catch(error => {
+        this.$message.error('数据请求失败！')
       })
     },
     toggleCollapse() {

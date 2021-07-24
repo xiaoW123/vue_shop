@@ -39,7 +39,7 @@ export default {
         username: 'admin',
         password: '123456'
       },
-      /* 表单规制验证 */
+      /* 表单规则验证 */
       loginFormRules: {
         username: [
             { required: true, message: '请输入登录名称', trigger: 'blur' },
@@ -64,15 +64,19 @@ export default {
         request({
           method: 'post',
           url: 'login',
-          data: {...this.loginForm} //配置登录的对象
+          //配置登录的对象
+          data: {...this.loginForm} 
         }).then((result) => {
-          const {data:res} = result //对象的解构 把result的data解构出 res
-          if(res.meta.status !== 200) return this.$message.error('登录失败哦~');
+          //对象的解构 把result的data解构出 res
+          const {data:res} = result 
+          // if(res.meta.status !== 200) return this.$message.error('登录失败~');
           this.$message.success('登录成功哦~');
-          // console.log(res)
+          
           /* 把请求到的token 保存到 sessionStorage */
           window.sessionStorage.setItem('token', res.data.token)
           this.$router.push('/home')
+        }).catch(error => {
+          this.$message.error('登录失败哦~');
         })
       })
     },
