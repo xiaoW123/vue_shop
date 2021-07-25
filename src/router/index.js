@@ -26,32 +26,14 @@ const router = new VueRouter({
           path: '/users',
           component: () => import('@/components/user/User.vue')
         },
-        // {
-        //   path: '/roles',
-        //   component: () => import('@/components/user/User.vue')
-        // },
-        // {
-        //   path: '/rights',
-        //   component: () => import('@/components/user/User.vue')
-        // },
-        // {
-        //   path: '/goods',
-        //   component: () => import('@/components/user/User.vue')
-        // },
-        // {
-        //   path: '/params',
-        //   component: () => import('@/components/user/User.vue')
-        // },
-        // {
-        //   path: '/categories',
-        //   component: () => import('@/components/user/User.vue')
-        // },{
-        //   path: '/orders',
-        //   component: () => import('@/components/user/User.vue')
-        // },{
-        //   path: '/reports',
-        //   component: () => import('@/components/user/User.vue')
-        // }
+        {
+          path: '/rights',
+          component: () => import('@/components/power/Rights.vue')
+        },
+        {
+          path: '/roles',
+          component: () => import('@/components/power/Roles.vue')
+        }
       ]
     }
   ],
