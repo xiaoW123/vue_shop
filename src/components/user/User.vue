@@ -70,6 +70,7 @@
                 type="danger"
                 icon="el-icon-delete"
                 size="mini"
+                @click="deleteClick(scope.row.id)"
               ></el-button>
             </el-tooltip>
 
@@ -335,7 +336,7 @@ export default {
     aditDialogClosed() {
       this.$refs.editFormRef.resetFields();
     },
-    // 编辑用户，点击你确认时
+    // 编辑用户，点击你确认时提交
     aditDialogClick() {
       this.$refs.editFormRef.validate((valid) => {
         request({
@@ -356,6 +357,47 @@ export default {
           this.$message.error('编辑失败~')
         })
       })
+    },
+    // 删除用户
+    async deleteClick(id) {
+      // this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
+      //     confirmButtonText: '确定',
+      //     cancelButtonText: '取消',
+      //     type: 'warning'
+      //   }).then(() => {
+      //     request({
+      //       method: 'delete',
+      //       url: `users/${id}`,
+      //     }).then(() => {
+      //       this.$message.success('删除成功')
+      //       this.grtUserList();
+      //     })
+      //   }).catch((err ) => {
+      //     this.$message.info('已取消删除');    
+      //     console.log(err)
+      //   })
+      // 使用 async、await语法糖
+      const deleteUsers = await this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).catch(err => err)
+
+        if (deleteUsers !== "confirm") {
+           this.$message.info('已取消删除~');    
+        } else {
+          request({
+            url: `users/${id}`,
+            method: 'delete'
+          }).then(() => {
+            this.$message.success('删除成功~')
+            this.grtUserList();
+          }).catch(() => {
+            this.$message.error('删除失败~')
+          })
+        }
+        
+          
     }
   },
 };
