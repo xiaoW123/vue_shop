@@ -79,6 +79,7 @@
                 type="warning"
                 icon="el-icon-setting"
                 size="mini"
+                @click="setUser(scope.row)"
               ></el-button>
             </el-tooltip>
           </template>
@@ -132,14 +133,19 @@
       </el-dialog>
 
       <!-- 编辑用户对话框 -->
-      <el-dialog title="编辑用户" :visible.sync="aditDialogVisible" width="50%" @close="aditDialogClosed">
+      <el-dialog
+        title="编辑用户"
+        :visible.sync="aditDialogVisible"
+        width="50%"
+        @close="aditDialogClosed"
+      >
         <el-form
           :model="editForm"
           :rules="editFormRules"
           ref="editFormRef"
           label-width="100px"
         >
-          <el-form-item label="用户名" prop="username" >
+          <el-form-item label="用户名" prop="username">
             <el-input v-model="editForm.username" :disabled="true"></el-input>
           </el-form-item>
 
@@ -157,9 +163,39 @@
           <el-button type="primary" @click="aditDialogClick()">确 定</el-button>
         </span>
       </el-dialog>
+
+      <!-- 分配角色对话框 -->
+      <el-dialog title="分配角色" :visible.sync="setUserShow" width="50%" @close="setRoleDialogClosed">
+        <div>
+          <p class="style_div">当前的用户：{{ userData.username }}</p>
+          <p class="style_div">当前的角色：{{ userData.role_name }}</p>
+          <p> 分配新角色：
+            <el-select v-model="selectedRoleId" placeholder="请选择">
+              <el-option
+                v-for="item in selectData"
+                :key="item.id"
+                :label="item.roleName"
+                :value="item.id"
+              >
+              </el-option>
+            </el-select>
+          </p>
+        </div>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="setUserShow = false">取 消</el-button>
+          <el-button type="primary" @click="qdUser">确 定</el-button>
+        </span>
+      </el-dialog>
     </el-card>
   </div>
 </template>
+
+        
+
+        
+
+
+
 
 <script>
 import { request } from "../../network/request";
@@ -184,7 +220,7 @@ export default {
       }
       callback(new Error("请输入合法的手机信息"));
     };
-    return { 
+    return {
       queryInfo: {
         // 搜索关键字
         query: "",
@@ -243,7 +279,12 @@ export default {
           { required: true, message: "请输入手机号", trigger: "blur" },
           { validator: checkMobile, trigger: "blur" },
         ],
-      }
+      },
+      // 分配角色
+      setUserShow: false,
+      userData: {},
+      selectedRoleId: '',
+      selectData: {}
     };
   },
   created() {
@@ -261,7 +302,7 @@ export default {
           const { data: res } = result.data;
           this.userlist = res.users;
           this.total = res.total;
-          console.log( this.userlist)
+          console.log(this.userlist);
         })
         .catch(() => {
           this.$message.error("获取信息失败！");
@@ -340,64 +381,86 @@ export default {
     aditDialogClick() {
       this.$refs.editFormRef.validate((valid) => {
         request({
-          method: 'put',
+          method: "put",
           url: `users/${this.editForm.id}`,
           // data: this.editForm
-          data:{
+          data: {
             mobile: this.editForm.mobile,
-            email: this.editForm.email,  
-          }
-        }).then(res=> {
-          console.log(res)
-          this.editForm = res.data.data
-          this.aditDialogVisible = false
-          this.grtUserList();
-          this.$message.success('编辑成功~')
-        }).catch(err => {
-          this.$message.error('编辑失败~')
+            email: this.editForm.email,
+          },
         })
-      })
+          .then((res) => {
+            console.log(res);
+            this.editForm = res.data.data;
+            this.aditDialogVisible = false;
+            this.grtUserList();
+            this.$message.success("编辑成功~");
+          })
+          .catch((err) => {
+            this.$message.error("编辑失败~");
+          });
+      });
     },
     // 删除用户
     async deleteClick(id) {
-      // this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
-      //     confirmButtonText: '确定',
-      //     cancelButtonText: '取消',
-      //     type: 'warning'
-      //   }).then(() => {
-      //     request({
-      //       method: 'delete',
-      //       url: `users/${id}`,
-      //     }).then(() => {
-      //       this.$message.success('删除成功')
-      //       this.grtUserList();
-      //     })
-      //   }).catch((err ) => {
-      //     this.$message.info('已取消删除');    
-      //     console.log(err)
-      //   })
       // 使用 async、await语法糖
-      const deleteUsers = await this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).catch(err => err)
-
-        if (deleteUsers !== "confirm") {
-           this.$message.info('已取消删除~');    
-        } else {
-          request({
-            url: `users/${id}`,
-            method: 'delete'
-          }).then(() => {
-            this.$message.success('删除成功~')
-            this.grtUserList();
-          }).catch(() => {
-            this.$message.error('删除失败~')
-          })
+      const deleteUsers = await this.$confirm(
+        "此操作将永久删除该用户, 是否继续?",
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
         }
-        
-          
+      ).catch((err) => err)
+      if (deleteUsers !== "confirm") {
+        this.$message.info("已取消删除~");
+      } else {
+        request({
+          url: `users/${id}`,
+          method: "delete",
+        })
+          .then(() => {
+            this.$message.success("删除成功~");
+            this.grtUserList();
+          })
+          .catch(() => {
+            this.$message.error("删除失败~");
+          });
+      }
+    },
+    // 分配角色
+    async setUser(data) {
+      this.setUserShow = true;
+      this.userData = data;
+
+      const { data: res } = await request({
+        url: "roles",
+        method: "get",
+      });
+      if (res.meta.status !== 200) return this.$message.error("获取角色信息失败~");
+      console.log(res);
+      this.selectData = res.data
+      console.log(this.selectData)
+    },
+    // 提交分配角色
+    async qdUser() {
+      const {data:res} = await request({
+        url: `users/${this.userData.id}/role`,
+        method: 'put',
+        data: {
+          rid: this.selectedRoleId
+        }
+      })
+      if(res.meta.status !== 200) return this.$message.error('分配角色失败~')
+      this.$message.success('分配角色成功~')
+      this.setUserShow = false
+      this.grtUserList();
+    },
+    // 关闭分配角色对话框
+    setRoleDialogClosed() {
+      this.selectedRoleId ='',
+      this.userData = {}
     }
   },
 };
@@ -411,5 +474,9 @@ export default {
 
 .el-pagination {
   margin-top: 15px;
+}
+
+.style_div {
+  margin-bottom: 15px;
 }
 </style>

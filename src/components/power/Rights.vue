@@ -70,7 +70,5 @@ export default {
   width: 25%;
 }
 
-.el-button--small {
-  line-height: 43px!important;
-}
+
 </style>
