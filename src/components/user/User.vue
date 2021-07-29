@@ -190,13 +190,6 @@
   </div>
 </template>
 
-        
-
-        
-
-
-
-
 <script>
 import { request } from "../../network/request";
 
